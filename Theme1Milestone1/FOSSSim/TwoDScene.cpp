@@ -202,9 +202,11 @@ void TwoDScene::insertForce( Force* newforce )
 
 scalar TwoDScene::computeKineticEnergy() const
 {
-    // TODO: homework, 1/2 m v^2
-
-    return -1.0;
+    // Your code goes here!
+    
+    // T = sum(1/2 * m * v^2) = sum(1/2 * m1 * v1^2 + 1/2 * m2 * v2^2)
+    //   = 1/2 * sum(mi * vi^2) = 1/2 * m_m^T * (m_v .* m_v)
+    return 0.5 * (m_m.dot(m_v.array().square().matrix()) );
 }
 
 scalar TwoDScene::computePotentialEnergy() const

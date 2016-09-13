@@ -12,20 +12,27 @@ ExplicitEuler::~ExplicitEuler()
  */
 bool ExplicitEuler::stepScene( TwoDScene& scene, scalar dt )
 {
+    // Your code goes here!
 
-    // q ̇^(n+1)=q ̇^n+hM^(−1) F(q^n,q ̇^n )
-    int num_particles = scene.getNumParticles();
     VectorXs& x = scene.getX(); // the system's position DoFs
     VectorXs& v = scene.getV(); // the system's velocity DoFs
-    // const VectorXs& m = scene.getM(); // the masses associated to each DoF
+    const VectorXs& m = scene.getM(); // the masses associated to each DoF
+
+    // F = - \grad(U)
+    VectorXs gradU; gradU.resize(x.size()); gradU.fill(0);
+    scene.accumulateGradU(gradU); // dx = 0, dv = 0
+    VectorXs a = - gradU.cwiseQuotient(m);
+
+    // x_new = x + v * dt
+    x += v * dt;
+    // v_new = v + a * dt
+    int num_particles = scene.getNumParticles();
     for (int i = 0; i < num_particles; ++i) {
         // Determine if the ith particle is fixed
         if (scene.isFixed(i)) continue;
-        // x_new = x + v * dt
-        x.segment<2>(2*i) += v.segment<2>(2*i) * dt; // const Vector2s& pos
-        // v_new = v + a * dt
-        // todo: suppose a == 0
+        v.segment<2>(2*i) += a.segment<2>(2*i) * dt;
     }
+
     return true;
 }
 
