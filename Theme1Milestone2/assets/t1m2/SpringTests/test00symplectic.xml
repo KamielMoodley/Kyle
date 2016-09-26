@@ -6,7 +6,7 @@
   <maxsimfreq max="500.0"/>
 
   <particle m="1.0" px="0.0" py=" 0.6" vx="0.0" vy="0.0" fixed="0"/>
-  <particle m="1.0" px="0.0" py="-0.6" vx="0.0" vy="0.0" fixed="0"/>
+  <particle m="1.0" px="0.0" py="-0.6" vx="0.0" vy="0.0" fixed="1"/>
 
   <edge i="0" j="1"/>
   <springforce edge="0" k="1.0" l0="1.0" />
