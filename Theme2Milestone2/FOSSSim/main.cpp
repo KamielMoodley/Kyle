@@ -7,6 +7,7 @@
 #include <tclap/CmdLine.h>
 
 // TODO: Clean these up, we don't need them all anymore.
+#include "testPoly.h"
 #include "TwoDScene.h"
 #include "Force.h"
 #include "SpringForce.h"
@@ -94,7 +95,7 @@ void stepSystem()
     std::cout << outputmod::startpink << "FOSSSim message: " << outputmod::endpink << "Simulation complete at time " << g_current_step*g_dt << ". Exiting." << std::endl;
     g_simulation_ran_to_completion = true;
     exit(0);
-  }  
+  }
 
   // If comparing simulations, copy state of comparison scene to simulated scene
   if( g_simulate_comparison ) {
@@ -106,11 +107,11 @@ void stepSystem()
   g_current_step++;
 
   // If the user wants to save output to a binary
-  if( g_save_to_binary ) 
+  if( g_save_to_binary )
     {
       g_executable_simulation->serializeScene(g_binary_output);
     }
-  
+
 
   // Update the state of the renderers
   if( g_rendering_enabled ) g_executable_simulation->updateOpenGLRendererState();
@@ -125,14 +126,14 @@ void stepSystem()
     // Generate a filename
     std::stringstream name;
     name << std::setfill('0');
-    name << g_movie_dir << "/frame" << std::setw(20) << g_current_step << ".svg";    
+    name << g_movie_dir << "/frame" << std::setw(20) << g_current_step << ".svg";
     // Actually write the svg out
-    g_executable_simulation->renderSceneSVG(name.str());    
-  }  
-  
+    g_executable_simulation->renderSceneSVG(name.str());
+  }
+
   // If comparing simulations, compute the accumulated residual
   if( g_simulate_comparison ) g_executable_simulation->updateSceneComparison();
-  
+
   // If the user wants to generate a PNG movie
   #ifdef PNGOUT
     std::stringstream oss;
@@ -149,7 +150,7 @@ void stepSystem()
 
 void syncScene()
 {
-    if( g_save_to_binary ) 
+    if( g_save_to_binary )
     {
         g_executable_simulation->serializeScene(g_binary_output);
     }
@@ -205,7 +206,7 @@ void dumpPNG(const std::string &filename)
   #endif
 }
 
-void reshape( int w, int h ) 
+void reshape( int w, int h )
 {
   g_display_controller.reshape(w,h);
 
@@ -213,14 +214,14 @@ void reshape( int w, int h )
 }
 
 // TODO: Move these functions to scene renderer?
-void setOrthographicProjection() 
+void setOrthographicProjection()
 {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	
+
 	gluOrtho2D(0, g_display_controller.getWindowWidth(), 0, g_display_controller.getWindowHeight());
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -228,7 +229,7 @@ void setOrthographicProjection()
   assert( renderingutils::checkGLErrors() );
 }
 
-void renderBitmapString( float x, float y, float z, void *font, std::string s ) 
+void renderBitmapString( float x, float y, float z, void *font, std::string s )
 {
 	glRasterPos3f(x, y, z);
 	for( std::string::iterator i = s.begin(); i != s.end(); ++i )
@@ -244,7 +245,7 @@ void drawHUD()
 {
   setOrthographicProjection();
   glColor3f(1.0-g_bgcolor.r,1.0-g_bgcolor.g,1.0-g_bgcolor.b);
-  renderBitmapString( 4, g_display_controller.getWindowHeight()-20, 0.0, GLUT_BITMAP_HELVETICA_18, stringutils::convertToString(g_current_step*g_dt) ); 
+  renderBitmapString( 4, g_display_controller.getWindowHeight()-20, 0.0, GLUT_BITMAP_HELVETICA_18, stringutils::convertToString(g_current_step*g_dt) );
   glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
@@ -303,7 +304,7 @@ void keyboard( unsigned char key, int x, int y )
   }
   else if( key == 'c' || key == 'C' )
   {
-    centerCamera();    
+    centerCamera();
     g_display_controller.reshape(g_display_controller.getWindowWidth(),g_display_controller.getWindowHeight());
     glutPostRedisplay();
   }
@@ -320,21 +321,21 @@ void keyboard( unsigned char key, int x, int y )
 void special( int key, int x, int y )
 {
   g_display_controller.special(key,x,y);
-  
+
   assert( renderingutils::checkGLErrors() );
 }
 
 void mouse( int button, int state, int x, int y )
 {
   g_display_controller.mouse(button,state,x,y);
-  
+
   assert( renderingutils::checkGLErrors() );
 }
 
-void motion( int x, int y ) 
+void motion( int x, int y )
 {
   g_display_controller.motion(x,y);
-  
+
   assert( renderingutils::checkGLErrors() );
 }
 
@@ -345,13 +346,13 @@ void idle()
   double current_time = timingutils::seconds();
   //std::cout << "current_time: " << current_time << std::endl;
   //std::cout << "g_sec_per_frame: " << g_sec_per_frame << std::endl;
-  if( !g_paused && current_time-g_last_time >= g_sec_per_frame ) 
+  if( !g_paused && current_time-g_last_time >= g_sec_per_frame )
   {
     g_last_time = current_time;
     stepSystem();
     glutPostRedisplay();
   }
-  
+
   assert( renderingutils::checkGLErrors() );
 }
 
@@ -369,11 +370,11 @@ void initializeOpenGLandGLUT( int argc, char** argv )
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
   glutIdleFunc(idle);
-  
+
   // Initialize OpenGL
 	reshape(g_display_controller.getWindowWidth(),g_display_controller.getWindowHeight());
   glClearColor(g_bgcolor.r, g_bgcolor.g, g_bgcolor.b, 1.0);
-  
+
   assert( renderingutils::checkGLErrors() );
 }
 
@@ -415,48 +416,48 @@ void loadScene( const std::string& file_name )
   // Integer number of timesteps to take
   g_num_steps = ceil(max_time/g_dt);
   // We begin at the 0th timestep
-  g_current_step = 0;  
+  g_current_step = 0;
 }
 
 void parseCommandLine( int argc, char** argv )
 {
-  try 
+  try
   {
     TCLAP::CmdLine cmd("Forty One Sixty Seven Sim");
-    
+
     // XML scene file to load
     TCLAP::ValueArg<std::string> scene("s", "scene", "Simulation to run; an xml scene file", true, "", "string", cmd);
-    
+
     // Begin the scene paused or running
     TCLAP::ValueArg<bool> paused("p", "paused", "Begin the simulation paused if 1, running if 0", false, true, "boolean", cmd);
-    
+
     // Run the simulation with rendering enabled or disabled
     TCLAP::ValueArg<bool> display("d", "display", "Run the simulation with display enabled if 1, without if 0", false, true, "boolean", cmd);
-    
+
     // These cannot be set at the same time
     // File to save output to
     TCLAP::ValueArg<std::string> output("o", "outputfile", "Binary file to save simulation state to", false, "", "string", cmd);
     // File to load for comparisons
     TCLAP::ValueArg<std::string> input("i", "inputfile", "Binary file to load simulation state from for comparison", false, "", "string", cmd);
-    
+
     // Save svgs to a movie directory
     TCLAP::ValueArg<std::string> movie("m", "moviedir", "Directory to output svg screenshot to", false, "", "string", cmd);
-    
+
     cmd.parse(argc, argv);
-    
+
     if( output.isSet() && input.isSet() ) throw TCLAP::ArgException( "arguments i and o specified simultaneously", "arguments i and o", "invalid argument combination" );
-    
+
     assert( scene.isSet() );
     g_xml_scene_file = scene.getValue();
     g_paused = paused.getValue();
     g_rendering_enabled = display.getValue();
-    
+
     if( output.isSet() )
     {
       g_save_to_binary = true;
       g_binary_file_name = output.getValue();
     }
-    
+
     if( input.isSet() )
     {
       g_simulate_comparison = true;
@@ -468,8 +469,8 @@ void parseCommandLine( int argc, char** argv )
       g_svg_enabled = true;
       g_movie_dir = movie.getValue();
     }
-  } 
-  catch (TCLAP::ArgException& e) 
+  }
+  catch (TCLAP::ArgException& e)
   {
     std::cerr << "error: " << e.what() << std::endl;
     exit(1);
@@ -504,21 +505,21 @@ void cleanupAtExit()
   {
     delete g_executable_simulation;
     g_executable_simulation = NULL;
-  }  
+  }
 }
 
 std::ostream& fosssim_header( std::ostream& stream )
 {
-  stream << outputmod::startgreen << 
+  stream << outputmod::startgreen <<
   "------------------------------------------    " << std::endl <<
   "  _____ ___  ____ ____ ____  _                " << std::endl <<
   " |  ___/ _ \\/ ___/ ___/ ___|(_)_ __ ___      " << std::endl <<
   " | |_ | | | \\___ \\___ \\___ \\| | '_ ` _ \\ " << std::endl <<
-  " |  _|| |_| |___) |__) |__) | | | | | | |     " << std::endl << 
+  " |  _|| |_| |___) |__) |__) | | | | | | |     " << std::endl <<
   " |_|   \\___/|____/____/____/|_|_| |_| |_|    " << std::endl <<
-  "------------------------------------------    " 
+  "------------------------------------------    "
   << outputmod::endgreen << std::endl;
-  
+
   return stream;
 }
 
@@ -575,11 +576,12 @@ void sceneScriptingCallback()
 
 int main( int argc, char** argv )
 {
+    test_poly();
   // Parse command line arguments
   parseCommandLine( argc, argv );
-  
+
   assert( !(g_save_to_binary && g_simulate_comparison) );
-  
+
   // Function to cleanup at progarm exit
   atexit(cleanupAtExit);
 
@@ -591,7 +593,7 @@ int main( int argc, char** argv )
   {
     // Attempt to open the binary
     g_binary_output.open(g_binary_file_name.c_str());
-    if( g_binary_output.fail() ) 
+    if( g_binary_output.fail() )
     {
       std::cerr << outputmod::startred << "ERROR IN INITIALIZATION: "  << outputmod::endred << "Failed to open binary output file: " << " `" << g_binary_file_name << "`   Exiting." << std::endl;
       exit(1);
@@ -604,14 +606,14 @@ int main( int argc, char** argv )
   {
     // Attempt to open the binary
     g_binary_input.open(g_comparison_file_name.c_str());
-    if( g_binary_input.fail() ) 
+    if( g_binary_input.fail() )
     {
       std::cerr << outputmod::startred << "ERROR IN INITIALIZATION: "  << outputmod::endred << "Failed to open binary input file: " << " `" << argv[3] << "`   Exiting." << std::endl;
       exit(1);
     }
     assert( g_executable_simulation != NULL );
     g_executable_simulation->loadComparisonScene(g_binary_input);
-  }  
+  }
 
   // Initialization for OpenGL and GLUT
   if( g_rendering_enabled ) initializeOpenGLandGLUT(argc,argv);
@@ -631,7 +633,7 @@ int main( int argc, char** argv )
   #else
     std::cout << outputmod::startblue << "Vectorization: " << outputmod::endblue << "Disabled" << std::endl;
   #endif
-  
+
   std::cout << outputmod::startblue << "Scene: " << outputmod::endblue << g_xml_scene_file << std::endl;
   std::cout << outputmod::startblue << "Integrator: " << outputmod::endblue << g_executable_simulation->getSolverName() << std::endl;
   std::cout << outputmod::startblue << "Collision Handling: " << outputmod::endblue << g_executable_simulation->getCollisionHandlerName() << std::endl;
