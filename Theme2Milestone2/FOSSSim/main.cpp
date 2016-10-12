@@ -7,7 +7,7 @@
 #include <tclap/CmdLine.h>
 
 // TODO: Clean these up, we don't need them all anymore.
-#include "testPoly.h"
+// #include "testPoly.h"
 #include "TwoDScene.h"
 #include "Force.h"
 #include "SpringForce.h"
@@ -576,7 +576,7 @@ void sceneScriptingCallback()
 
 int main( int argc, char** argv )
 {
-    test_poly();
+    // test_poly();
   // Parse command line arguments
   parseCommandLine( argc, argv );
 

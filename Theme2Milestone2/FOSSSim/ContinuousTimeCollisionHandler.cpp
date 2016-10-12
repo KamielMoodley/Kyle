@@ -420,7 +420,24 @@ bool ContinuousTimeCollisionHandler::detectParticleHalfplane(const TwoDScene &sc
     std::vector<double> position_polynomial;
     std::vector<double> velocity_polynomial;
 
+    // Add Theme 2 Milestone 2 code here.
+
     // Your implementation here should fill the polynomials with right coefficients
+
+    scalar npsqr = np.squaredNorm();
+    assert(npsqr > 0);
+
+    // (px - x1).dot(pn)^2 < r^2 * pnsqr
+    // r^2 * pnsqr - (t*dx1*pn + (x1-px)*pn)^2 > 0
+    // r^2 * npsqr - ((px-x1)*pn)^2 + 2*(dx1*pn)*((px-x1)*pn) t - (dx1*pn)^2 t^2 > 0
+    position_polynomial.push_back(-pow(dx1.dot(np),2));
+    position_polynomial.push_back(2 * dx1.dot(np) * (xp-x1).dot(np));
+    position_polynomial.push_back(r*r*npsqr - pow((xp-x1).dot(np),2));
+
+    // (xp-x1 - t*dx1).dot(np) * (np*dx1) > 0
+    // ((xp-x1)*np * np*dx1) - t * dx1*np * np*dx1 > 0 // np*np
+    velocity_polynomial.push_back(-dx1.dot(np)*dx1.dot(np));
+    velocity_polynomial.push_back((xp-x1).dot(np)*dx1.dot(np));
 
     // Do not change the order of the polynomials here, or your program will fail the oracle
     std::vector<Polynomial> polynomials;
@@ -431,5 +448,8 @@ bool ContinuousTimeCollisionHandler::detectParticleHalfplane(const TwoDScene &sc
 
     // Your implementation here should compute n, and examine time to decide the return value
 
-    return false;
+    Vector2s x1t = x1 + time * dx1;
+    n = (xp - x1t).dot(np)/npsqr * np ;
+    if (0 < time && time < 1) return true; // == ??
+    else return false;
 }
